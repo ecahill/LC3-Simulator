@@ -1,4 +1,3 @@
-# This is only a basic Makefile Make changes as you will.
 CC = gcc
 CFLAGS = -std=c99 -pedantic -Wall -Werror
 OPTFLAG = -O2
