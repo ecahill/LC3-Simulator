@@ -23,7 +23,6 @@ clean:
 	rm -f *.o $(PROGRAM)
 
 # Simple debug target
-# just run it and it will do a rebuild everytime.
 debug : CFLAGS += $(DEBUGFLAG) 
 debug : clean $(PROGRAM)
 
