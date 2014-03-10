@@ -18,39 +18,39 @@ void lc3_load(lc3machine* state, const char* program)
 	int fsize = 0;
 	file = fopen(program, "r");
 	if (file!=NULL){
-		fseek(file, 0, SEEK_END); // go to end of file
-		fsize = ftell(file); // get size of file
-		rewind(file); // go back to beginning
-		short nums[fsize/2]; //#of bytes divided by 2 is number of instructions
+		fseek(file, 0, SEEK_END); 		// go to end of file
+		fsize = ftell(file); 			// get size of file
+		rewind(file); 				// go back to beginning
+		short nums[fsize/2]; 			//#of bytes divided by 2 is number of instructions
 		for (i = 0; i < fsize; i++){ 
 			if (i%2==0){
-				j = fgetc(file); // read first byte
+				j = fgetc(file); 	// read first byte
 				j = j<<8;
 				
 			}
 			else{
-				k = fgetc(file); // read second byte, if i is odd, merge bytes
-				k = k|j; // Or second byte with shifted first byte
-				nums[l] = k; // put short in array
+				k = fgetc(file); 	// read second byte, if i is odd, merge bytes
+				k = k|j; 	 	// Or second byte with shifted first byte
+				nums[l] = k	 	// put short in array
 				l++;
 			}
 		}
 		int origNum = 0;
 		int amtNum = 1;
 		int count = 0;
-		while(count < fsize/2){ //read file while there are still values to read
-			short orig = nums[origNum]; // origin is first value in array
-			count++; // increment count everytime value is stored in nums
-			short amount = nums[amtNum]; // amount of instructions is second value in array
+		while(count < fsize/2){ 		//read file while there are still values to read
+			short orig = nums[origNum]; 	// origin is first value in array
+			count++;			// increment count everytime value is stored in nums
+			short amount = nums[amtNum]; 	// amount of instructions is second value in array
 			count++;
 			for(i = amtNum+1; i < amtNum+amount+1; i++) // fill as many values as specified by amount
 			{
-				state->mem[orig] = nums[i]; // put amount (as specified above) of values in memory
-				orig++; // increment memory address
-				count++; // increment count
+				state->mem[orig] = nums[i]; 	// put amount (as specified above) of values in memory
+				orig++; 			// increment memory address
+				count++; 			// increment count
 			}
-			origNum = amount+amtNum+1;// new orig = first value after old values
-			amtNum  = origNum+1; //new amtNum is right after new orig
+			origNum = amount+amtNum+1;		// new orig = first value after old values
+			amtNum  = origNum+1; 			//new amtNum is right after new orig
 		}
 			
 	
@@ -63,16 +63,16 @@ void lc3_load(lc3machine* state, const char* program)
 
 void lc3_step_one(lc3machine* state)
 {
-		state->halted = 0; //??
-		unsigned short instr = lc3_fetch(state); // get instruction returned from fetch
-		lc3_execute(state, instr);  // execute that instruction
+		state->halted = 0; 
+		unsigned short instr = lc3_fetch(state); 	// get instruction returned from fetch
+		lc3_execute(state, instr);  			// execute that instruction
 }
 
 void lc3_run(lc3machine* state, int num_steps)
 {
 	state->halted = 0;
 	if (num_steps == -1){
-		while(!state->halted){ //while not halted
+		while(!state->halted){ 		//while not halted
 			lc3_step_one(state);
 		}
 	}
@@ -80,7 +80,7 @@ void lc3_run(lc3machine* state, int num_steps)
 		int i;
 		for (i = 0; i < num_steps; i++)
 		{
-			if (!state->halted) // if not halted
+			if (!state->halted) 	// if not halted
 				lc3_step_one(state);  // do as many steps as specified
 			else 
 				break;
@@ -90,8 +90,8 @@ void lc3_run(lc3machine* state, int num_steps)
 
 unsigned short lc3_fetch(lc3machine* state)
 {
-	int memAddress = state->pc; //get address currently in pc
-	(state->pc)++; // increment pc
+	int memAddress = state->pc; 	//get address currently in pc
+	(state->pc)++; 			// increment pc
 	return state->mem[memAddress]; // return instruction at spot in memory at address
 }
 
@@ -100,14 +100,14 @@ void lc3_execute(lc3machine* state, unsigned short instruction)
 	short opcode = instruction>>12;
 	if (opcode == 1) // ADD
 	{
-		short dr = (instruction&0x0E00)>>9; // get dr
-		short sr1 = (instruction&0x01C0)>>6; // get sr
-		if (instruction&0x0020){ // adding register or imm5?
+		short dr = (instruction&0x0E00)>>9; 	// get dr
+		short sr1 = (instruction&0x01C0)>>6; 	// get sr
+		if (instruction&0x0020){ 		// check whether adding register or imm5
 			short imm5 = (instruction&0x001F)|((instruction&0x0010)? 0xFFE0:0); // sign extend the imm5
 			state->regs[dr] = state->regs[sr1] + imm5; // dr = sr + imm5
 		}
 		else{
-			short sr2 = instruction&0x0007; // get sr2
+			short sr2 = instruction&0x0007; 			// get sr2
 			state->regs[dr] = state->regs[sr1] + state->regs[sr2]; // dr = sr + sr2
 		}
 		if (state->regs[dr] == 0) // check cc
