@@ -45,3 +45,12 @@ All of these user input commands are supported by the simulator
   Sets a register to a value ex setreg R0 10 will set R0 to 10.
 
 The [] syntax means that the argument is optional.
+
+
+##The Format
+
+An LC-3 assembled object file has a simple binary file format. The first 16-bit value is the
+
+starting address to place code. The second 16-bit value is the number of values to put starting at
+
+the starting address. Each subsequent value is data to put at the current address.
